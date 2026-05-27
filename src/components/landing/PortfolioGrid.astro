@@ -1,0 +1,20 @@
+---
+import type { Locale } from '@/config/site';
+import { dictionaries, t } from '@/i18n';
+import { projects } from '@/data/projects';
+import ProjectDialog from './ProjectDialog';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const labels = dictionaries[locale];
+---
+
+<section id="portafolio" style="padding:6rem 0;border-top:1px solid hsl(var(--border));">
+  <div class="container">
+    <h2 class="section-title">{t(locale, 'landing-portfolio-title')}</h2>
+    <p class="section-sub">{t(locale, 'landing-portfolio-subtitle')}</p>
+    <div class="showcase-grid">
+      {projects.map((project) => <ProjectDialog client:load project={project} labels={labels} />)}
+    </div>
+  </div>
+</section>

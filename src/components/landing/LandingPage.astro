@@ -1,0 +1,33 @@
+---
+import type { Locale } from '@/config/site';
+import { dictionaries, t } from '@/i18n';
+import HeroSection from './HeroSection.astro';
+import PricingCards from './PricingCards.astro';
+import PortfolioGrid from './PortfolioGrid.astro';
+import TechStackMarquee from './TechStackMarquee';
+import SmartContactHub from './SmartContactHub';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const labels = dictionaries[locale];
+---
+
+<HeroSection locale={locale} />
+<TechStackMarquee
+  client:load
+  title={t(locale, 'landing-tech-marquee-title')}
+  labels={{
+    modern: t(locale, 'landing-tech-type-modern'),
+    mobile: t(locale, 'landing-tech-type-mobile'),
+    enterprise: t(locale, 'landing-tech-type-enterprise'),
+    legacy: t(locale, 'landing-tech-type-legacy'),
+  }}
+/>
+<PricingCards locale={locale} />
+<PortfolioGrid locale={locale} />
+<SmartContactHub
+  client:load
+  labels={labels}
+  turnstileSiteKey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
+  recaptchaSiteKey={import.meta.env.NEXT_PUBLIC_RECAPTCHA_PUBLIC_KEY}
+/>

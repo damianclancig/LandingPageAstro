@@ -1,0 +1,55 @@
+---
+import type { Locale } from '@/config/site';
+import { t } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+  variantClass?: string;
+}
+
+const { locale, variantClass = '' } = Astro.props;
+
+const localeLabels: Record<Locale, string> = {
+  es: 'Espanol',
+  en: 'English',
+  pt: 'Portugues',
+};
+
+const localeItems: Array<{ code: Locale; href: string }> = [
+  { code: 'es', href: '/es' },
+  { code: 'en', href: '/en' },
+  { code: 'pt', href: '/pt' },
+];
+---
+
+<details class:list={[variantClass, 'locale-dropdown'].filter(Boolean)}>
+  <summary class="locale-toggle" aria-label={t(locale, 'ui-language-selector')}>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="locale-icon">
+      <path
+        d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Z"
+        stroke="currentColor"
+        stroke-width="1.75"
+      />
+      <path
+        d="M2 12h20"
+        stroke="currentColor"
+        stroke-width="1.75"
+      />
+      <path
+        d="M12 2c2.6 2.7 4 6.2 4 10s-1.4 7.3-4 10c-2.6-2.7-4-6.2-4-10s1.4-7.3 4-10Z"
+        stroke="currentColor"
+        stroke-width="1.75"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    <span class="locale-current">{locale.toUpperCase()}</span>
+  </summary>
+  <div class="locale-menu card" role="menu" aria-label={t(locale, 'ui-language-options')}>
+    {localeItems.map((item) => (
+      <a href={item.href} class={`locale-option ${locale === item.code ? 'active' : ''}`} role="menuitem">
+        {item.code.toUpperCase()} - {localeLabels[item.code]}
+      </a>
+    ))}
+  </div>
+</details>

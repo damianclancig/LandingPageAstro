@@ -1,0 +1,32 @@
+---
+import type { Locale } from '@/config/site';
+import { t } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<section style="position:relative;min-height:88vh;display:grid;place-items:center;overflow:hidden;background:hsl(var(--background));padding-top:clamp(4rem,9vw,5.75rem);">
+  <img src="/images/background.webp" alt={t(locale, 'hero-codeBackgroundAlt')} loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(7px);transform:scale(1.03);" />
+  <div style="position:absolute;inset:0;background:linear-gradient(180deg, hsl(var(--background) / 0.76) 0%, hsl(var(--background) / 0.84) 100%);"></div>
+  <div class="container" style="position:relative;z-index:2;text-align:center;transform:translateY(-48px);">
+    <img src="/images/foto_perfil_v2.webp" alt="Damián Clancig" width="156" height="156" style="display:block;margin-inline:auto;width:156px;height:156px;border-radius:999px;border:4px solid rgba(8,8,8,.95);object-fit:cover;box-shadow:0 0 36px rgba(45,212,191,.62),0 0 86px rgba(45,212,191,.38);" />
+    <h1 class="section-title hero-title" style="margin-top:1.25rem;line-height:1.1;">
+      <span class="hero-heading-main">{t(locale, 'landing-hero-headline-main')}</span>
+      <span class="hero-heading-secondary">{t(locale, 'landing-hero-headline-secondary')}</span>
+    </h1>
+    <p class="section-sub hero-sub" style="max-width:760px;margin:0 auto;">{t(locale, 'landing-hero-subtext')}</p>
+    <ul class="hero-trust-list" aria-label="Señales de confianza">
+      <li class="hero-trust-item">{t(locale, 'landing-hero-trust-1')}</li>
+      <li class="hero-trust-item">{t(locale, 'landing-hero-trust-2')}</li>
+      <li class="hero-trust-item">{t(locale, 'landing-hero-trust-3')}</li>
+    </ul>
+    <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:.75rem;margin-top:2rem;">
+      <a href="#contacto" class="hero-cta" style="padding:.75rem 1rem;border-radius:.6rem;background:hsl(var(--primary));color:hsl(var(--primary-foreground));text-decoration:none;font-weight:600;">{t(locale, 'landing-hero-cta-primary')}</a>
+      <a href="#portafolio" class="hero-cta" style="padding:.75rem 1rem;border-radius:.6rem;border:1px solid hsl(var(--border));background:hsl(var(--card));color:hsl(var(--foreground));text-decoration:none;">{t(locale, 'landing-hero-cta-secondary')}</a>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,29 @@
+---
+import type { Locale } from '@/config/site';
+import { t } from '@/i18n';
+
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const plans = [
+  { key: 'essential', title: t(locale, 'landing-services-essential-title'), desc: t(locale, 'landing-services-essential-desc'), name: t(locale, 'landing-services-essential-name') },
+  { key: 'business', title: t(locale, 'landing-services-business-title'), desc: t(locale, 'landing-services-business-desc'), name: t(locale, 'landing-services-business-name') },
+  { key: 'enterprise', title: t(locale, 'landing-services-enterprise-title'), desc: t(locale, 'landing-services-enterprise-desc'), name: t(locale, 'landing-services-enterprise-name') },
+];
+---
+
+<section id="servicios" style="padding:6rem 0;background:hsl(var(--background-alt));">
+  <div class="container">
+    <h2 class="section-title">{t(locale, 'landing-services-title')}</h2>
+    <p class="section-sub">{t(locale, 'landing-services-subtitle')}</p>
+    <div class="services-grid">
+      {plans.map((plan, idx) => (
+        <article class={`card glow service-card ${idx === 1 ? 'is-featured' : ''}`}>
+          <p class="service-plan-name">{plan.name}</p>
+          <h3 class="service-plan-title">{plan.title}</h3>
+          <p class="service-plan-desc">{plan.desc}</p>
+          <a href="#contacto" class="service-plan-cta">{t(locale, 'landing-services-cta')}</a>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>

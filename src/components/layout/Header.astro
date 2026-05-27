@@ -1,0 +1,313 @@
+---
+import type { Locale } from '@/config/site';
+import { navItems } from '@/data/nav-items';
+import { t } from '@/i18n';
+import LocaleDropdown from './header/LocaleDropdown.astro';
+import ThemeDropdown from './header/ThemeDropdown.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href={`/${locale}`} class="brand-link" aria-label={t(locale, 'appName')}>
+      <img src="/images/logo.webp" alt="Clancig FullstackDev" width="150" height="46" class="brand-logo" />
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary Navigation">
+      {navItems.map((item) => <a href={item.href} class="nav-link">{t(locale, item.labelKey)}</a>)}
+    </nav>
+
+    <div class="desktop-controls">
+      <LocaleDropdown locale={locale} variantClass="desktop-locales" />
+      <ThemeDropdown locale={locale} />
+    </div>
+
+    <details class="mobile-menu">
+      <summary aria-label="Open Menu">
+        <span class="mobile-toggle-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" class="mobile-menu-icon mobile-menu-icon-open">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+          </svg>
+          <svg viewBox="0 0 24 24" fill="none" class="mobile-menu-icon mobile-menu-icon-close">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+          </svg>
+        </span>
+      </summary>
+      <div class="mobile-panel card">
+        <div class="mobile-panel-head">
+          <a href={`/${locale}`} class="brand-link" aria-label={t(locale, 'appName')}>
+            <img src="/images/logo.webp" alt="Clancig FullstackDev" width="132" height="40" class="brand-logo mobile-panel-logo" />
+          </a>
+        </div>
+
+        <div class="mobile-separator" aria-hidden="true"></div>
+
+        <nav class="mobile-nav" aria-label="Mobile Navigation">
+          {navItems.map((item) => <a href={item.href} class="mobile-link">{t(locale, item.labelKey)}</a>)}
+        </nav>
+
+        <div class="mobile-separator" aria-hidden="true"></div>
+
+        <div class="mobile-tools">
+          <LocaleDropdown locale={locale} variantClass="mobile-locales" />
+          <ThemeDropdown locale={locale} />
+        </div>
+      </div>
+    </details>
+  </div>
+</header>
+
+<script is:inline>
+  const THEME_STORAGE_KEY = 'theme-preference';
+  const MOBILE_DRAWER_CLOSE_MS = 420;
+
+  const isTheme = (value) => value === 'light' || value === 'dark' || value === 'system';
+
+  const getStoredTheme = () => {
+    const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
+    return isTheme(saved) ? saved : 'system';
+  };
+
+  const applyTheme = (theme) => {
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const resolvedTheme = theme === 'system' ? (prefersDark ? 'dark' : 'light') : theme;
+    document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+    document.documentElement.dataset.theme = theme;
+  };
+
+  const updateThemeOptionsUI = () => {
+    const current = getStoredTheme();
+    document.querySelectorAll('[data-theme-option]').forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return;
+      const isActive = option.dataset.themeOption === current;
+      option.classList.toggle('active', isActive);
+      option.setAttribute('aria-checked', String(isActive));
+    });
+  };
+
+  const setTheme = (theme) => {
+    window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+    applyTheme(theme);
+    updateThemeOptionsUI();
+  };
+
+  const getTargetFromHash = (hash) => {
+    if (!hash || !hash.startsWith('#') || hash.length < 2) return null;
+    const targetId = decodeURIComponent(hash.slice(1));
+    return document.getElementById(targetId);
+  };
+
+  const scrollToHashTarget = (hash, delayMs = 0) => {
+    const target = getTargetFromHash(hash);
+    if (!(target instanceof HTMLElement)) return;
+    const run = () => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.history.replaceState(null, '', hash);
+    };
+    if (delayMs > 0) {
+      window.setTimeout(run, delayMs);
+      return;
+    }
+    run();
+  };
+
+  const setupManagedDropdowns = (managedDropdowns) => {
+    const closeManagedDropdowns = (except) => {
+      managedDropdowns.forEach((dropdown) => {
+        if (dropdown === except) return;
+        dropdown.removeAttribute('open');
+      });
+    };
+
+    managedDropdowns.forEach((dropdown) => {
+      dropdown.addEventListener('toggle', () => {
+        if (dropdown.open) {
+          closeManagedDropdowns(dropdown);
+        }
+      });
+    });
+
+    return { closeManagedDropdowns };
+  };
+
+  const createMobileMenuController = (mobileMenu, body) => {
+    let mobileClosingTimeout = null;
+    let previousBodyPaddingRight = '';
+
+    const lockPageScroll = () => {
+      if (body.classList.contains('mobile-menu-modal')) return;
+      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+      previousBodyPaddingRight = body.style.paddingRight;
+      body.classList.add('mobile-menu-modal');
+      body.style.paddingRight = `${Math.max(0, scrollbarWidth)}px`;
+      document.documentElement.style.setProperty('--mobile-scrollbar-comp', `${Math.max(0, scrollbarWidth)}px`);
+    };
+
+    const unlockPageScroll = () => {
+      if (!body.classList.contains('mobile-menu-modal')) return;
+      body.classList.remove('mobile-menu-modal', 'is-closing-mobile-menu');
+      body.style.paddingRight = previousBodyPaddingRight;
+      document.documentElement.style.removeProperty('--mobile-scrollbar-comp');
+    };
+
+    const finishMobileClose = () => {
+      if (!(mobileMenu instanceof HTMLDetailsElement)) return;
+      mobileMenu.classList.remove('is-closing');
+      mobileMenu.removeAttribute('open');
+      unlockPageScroll();
+      if (mobileClosingTimeout !== null) {
+        window.clearTimeout(mobileClosingTimeout);
+        mobileClosingTimeout = null;
+      }
+    };
+
+    const closeMobileMenu = ({ animate = true } = {}) => {
+      if (!(mobileMenu instanceof HTMLDetailsElement) || !mobileMenu.open) return;
+
+      if (!animate) {
+        body.classList.remove('is-closing-mobile-menu');
+        finishMobileClose();
+        return;
+      }
+
+      if (mobileMenu.classList.contains('is-closing')) return;
+      mobileMenu.classList.add('is-closing');
+      body.classList.add('is-closing-mobile-menu');
+      mobileClosingTimeout = window.setTimeout(() => {
+        finishMobileClose();
+      }, MOBILE_DRAWER_CLOSE_MS);
+    };
+
+    const bindMobileMenuLifecycle = () => {
+      if (!(mobileMenu instanceof HTMLDetailsElement)) return;
+      const mobileSummary = mobileMenu.querySelector('summary');
+
+      if (mobileSummary instanceof HTMLElement) {
+        mobileSummary.addEventListener('click', (event) => {
+          if (!mobileMenu.open) return;
+          event.preventDefault();
+          closeMobileMenu();
+        });
+      }
+
+      mobileMenu.addEventListener('toggle', () => {
+        if (mobileMenu.open) {
+          lockPageScroll();
+          body.classList.remove('is-closing-mobile-menu');
+          return;
+        }
+
+        mobileMenu.classList.remove('is-closing');
+        unlockPageScroll();
+      });
+
+      mobileMenu.querySelectorAll('.mobile-link, .mobile-panel-head .brand-link').forEach((element) => {
+        element.addEventListener('click', () => {
+          closeMobileMenu();
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.matchMedia('(min-width: 900px)').matches) {
+          closeMobileMenu({ animate: false });
+        }
+      });
+    };
+
+    return { closeMobileMenu, bindMobileMenuLifecycle };
+  };
+
+  const setupHeaderInteractions = () => {
+    const managedDropdowns = Array.from(document.querySelectorAll('details.locale-dropdown, details.theme-dropdown'));
+    const mobileMenu = document.querySelector('details.mobile-menu');
+    const body = document.body;
+    const { closeManagedDropdowns } = setupManagedDropdowns(managedDropdowns);
+    const { closeMobileMenu, bindMobileMenuLifecycle } = createMobileMenuController(mobileMenu, body);
+
+    document.addEventListener('click', (event) => {
+      if (
+        event.defaultPrevented
+        || event.button !== 0
+        || event.metaKey
+        || event.ctrlKey
+        || event.shiftKey
+        || event.altKey
+      ) {
+        return;
+      }
+
+      if (event.target instanceof Element) {
+        const anchor = event.target.closest('a[href^="#"]');
+        if (anchor instanceof HTMLAnchorElement) {
+          const hash = anchor.getAttribute('href') ?? '';
+          const hasTarget = getTargetFromHash(hash);
+          if (hasTarget) {
+            event.preventDefault();
+            const shouldDelayScroll = mobileMenu instanceof HTMLDetailsElement && mobileMenu.open;
+            if (shouldDelayScroll) {
+              closeMobileMenu();
+            }
+            scrollToHashTarget(hash, shouldDelayScroll ? MOBILE_DRAWER_CLOSE_MS : 0);
+            return;
+          }
+        }
+      }
+
+      if (!(event.target instanceof Node)) return;
+      const clickedInsideDropdown = managedDropdowns.some((dropdown) => dropdown.contains(event.target));
+      if (!clickedInsideDropdown) {
+        closeManagedDropdowns();
+      }
+
+      if (mobileMenu instanceof HTMLDetailsElement && mobileMenu.open) {
+        const clickedInsideMobile = mobileMenu.contains(event.target);
+        if (!clickedInsideMobile) {
+          closeMobileMenu();
+        }
+      }
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeManagedDropdowns();
+        closeMobileMenu();
+      }
+    });
+
+    bindMobileMenuLifecycle();
+  };
+
+  const setupThemeSwitcher = () => {
+    setupHeaderInteractions();
+
+    document.querySelectorAll('[data-theme-option]').forEach((option) => {
+      if (!(option instanceof HTMLButtonElement)) return;
+      option.addEventListener('click', () => {
+        const selectedTheme = option.dataset.themeOption;
+        if (!isTheme(selectedTheme)) return;
+        setTheme(selectedTheme);
+        option.closest('details')?.removeAttribute('open');
+      });
+    });
+
+    updateThemeOptionsUI();
+
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+      if (getStoredTheme() === 'system') {
+        applyTheme('system');
+      }
+    });
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupThemeSwitcher, { once: true });
+  } else {
+    setupThemeSwitcher();
+  }
+</script>

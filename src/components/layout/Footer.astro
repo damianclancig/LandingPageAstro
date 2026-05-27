@@ -1,0 +1,142 @@
+---
+import type { Locale } from '@/config/site';
+import { t } from '@/i18n';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+
+const emailAddress = import.meta.env.NEXT_PUBLIC_EMAIL_ADDRESS;
+const instagramUser = import.meta.env.NEXT_PUBLIC_INSTAGRAM_USER;
+const linkedinUser = import.meta.env.NEXT_PUBLIC_LINKEDIN_USER;
+const githubUser = import.meta.env.NEXT_PUBLIC_GITHUB_USER;
+const whatsappNumber = import.meta.env.NEXT_PUBLIC_WHATSAPP_NUMBER;
+const cafecitoUser = import.meta.env.NEXT_PUBLIC_CAFECITO_USER;
+
+type SocialLink = {
+  href: string;
+  kind: 'instagram' | 'linkedin' | 'github' | 'whatsapp' | 'email' | 'cafecito';
+  tooltip: string;
+};
+const socialLinks: SocialLink[] = [];
+
+if (instagramUser) {
+  socialLinks.push({
+    href: `https://instagram.com/${instagramUser}`,
+    kind: 'instagram',
+    tooltip: t(locale, 'socials-instagramTooltip'),
+  });
+}
+if (linkedinUser) {
+  socialLinks.push({
+    href: `https://linkedin.com/in/${linkedinUser}`,
+    kind: 'linkedin',
+    tooltip: t(locale, 'socials-linkedinTooltip'),
+  });
+}
+if (githubUser) {
+  socialLinks.push({
+    href: `https://github.com/${githubUser}`,
+    kind: 'github',
+    tooltip: t(locale, 'socials-githubTooltip'),
+  });
+}
+if (whatsappNumber) {
+  socialLinks.push({
+    href: `https://wa.me/${whatsappNumber}`,
+    kind: 'whatsapp',
+    tooltip: t(locale, 'socials-whatsappTooltip'),
+  });
+}
+if (emailAddress) {
+  socialLinks.push({
+    href: `mailto:${emailAddress}`,
+    kind: 'email',
+    tooltip: t(locale, 'socials-emailTooltip'),
+  });
+}
+if (cafecitoUser) {
+  socialLinks.push({
+    href: `https://cafecito.app/${cafecitoUser}`,
+    kind: 'cafecito',
+    tooltip: t(locale, 'socials-cafecitoTooltip'),
+  });
+}
+---
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <div class="footer-column footer-column-brand">
+      <p class="footer-brand">Damián Clancig</p>
+      <p class="footer-slogan">{t(locale, 'landing-footer-copy')}</p>
+    </div>
+
+    <div class="footer-column footer-column-socials">
+      {socialLinks.length > 0 && (
+        <nav class="footer-socials" aria-label="Social Links">
+          {socialLinks.map((link) => (
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noreferrer"
+              class="social-pill"
+              title={link.tooltip}
+              aria-label={link.tooltip}
+            >
+              {link.kind === 'instagram' && (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="social-icon">
+                  <rect x="3" y="3" width="18" height="18" rx="5" stroke="currentColor" stroke-width="1.8" />
+                  <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="1.8" />
+                  <circle cx="17" cy="7" r="1" fill="currentColor" />
+                </svg>
+              )}
+              {link.kind === 'linkedin' && (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="social-icon">
+                  <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4V9h4v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <rect x="2" y="9" width="4" height="12" stroke="currentColor" stroke-width="1.8" />
+                  <circle cx="4" cy="4" r="1.8" stroke="currentColor" stroke-width="1.8" />
+                </svg>
+              )}
+              {link.kind === 'github' && (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="social-icon">
+                  <path d="M9 19c-4 1.5-4-2.5-6-3m12 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7a5.44 5.44 0 0 0-1.5-3.75 5.07 5.07 0 0 0-.09-3.77S17.73.65 15 2.48a13.38 13.38 0 0 0-6 0C6.27.65 5.09 1 5.09 1a5.07 5.07 0 0 0-.09 3.77 5.44 5.44 0 0 0-1.5 3.75c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              )}
+              {link.kind === 'whatsapp' && (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="social-icon">
+                  <path
+                    d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              )}
+              {link.kind === 'cafecito' && (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="social-icon">
+                  <path d="M17 8h1a3 3 0 0 1 0 6h-1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M3 8h14v7a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V8Z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                  <path d="M6 2v2m4-2v2m4-2v2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              )}
+              {link.kind === 'email' && (
+                <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="social-icon">
+                  <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="1.8" />
+                  <path d="m4 7 8 6 8-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+              )}
+            </a>
+          ))}
+        </nav>
+      )}
+    </div>
+
+    <div class="footer-column footer-column-rights">
+      <p class="footer-copy">{t(locale, 'footer-copy', { year: new Date().getFullYear() })}</p>
+      <p class="footer-tech">{t(locale, 'landing-footer-tech')}</p>
+    </div>
+  </div>
+</footer>

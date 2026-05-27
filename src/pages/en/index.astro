@@ -1,0 +1,9 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import LandingPage from '@/components/landing/LandingPage.astro';
+import { buildCanonical, buildTitle } from '@/lib/metadata';
+---
+
+<BaseLayout locale="en" title={buildTitle()} canonical={buildCanonical('en')}>
+  <LandingPage locale="en" />
+</BaseLayout>

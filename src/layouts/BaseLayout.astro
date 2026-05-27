@@ -1,0 +1,83 @@
+---
+import '@/styles.css';
+import { locales, siteConfig, type Locale } from '@/config/site';
+import { buildDescription } from '@/lib/metadata';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+  canonical?: string;
+}
+
+const { locale, title = siteConfig.name, description, canonical } = Astro.props;
+const pageCanonical = canonical ?? `${siteConfig.url}/${locale}`;
+const pageDescription = description ?? buildDescription(locale);
+const pageLocale = siteConfig.localeMap[locale] ?? siteConfig.localeMap.es;
+const alternateOgLocales = locales
+  .filter((entry: Locale) => entry !== locale)
+  .map((entry: Locale) => siteConfig.localeMap[entry]);
+---
+
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <script is:inline>
+      (() => {
+        const storageKey = 'theme-preference';
+        const saved = window.localStorage.getItem(storageKey);
+        const theme = saved === 'light' || saved === 'dark' || saved === 'system' ? saved : 'system';
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const resolvedTheme = theme === 'system' ? (prefersDark ? 'dark' : 'light') : theme;
+        document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
+    <link rel="icon" href="/images/foto_perfil_v2.webp" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <meta name="description" content={pageDescription} />
+    <meta name="author" content={siteConfig.owner} />
+    <meta name="application-name" content={siteConfig.name} />
+    <meta name="robots" content="index, follow" />
+    <meta name="theme-color" content="#09090b" />
+    <link rel="canonical" href={pageCanonical} />
+    <link rel="alternate" hreflang="es" href={`${siteConfig.url}/es`} />
+    <link rel="alternate" hreflang="en" href={`${siteConfig.url}/en`} />
+    <link rel="alternate" hreflang="pt" href={`${siteConfig.url}/pt`} />
+    <link rel="alternate" hreflang="x-default" href={`${siteConfig.url}/es`} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteConfig.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={pageDescription} />
+    <meta property="og:url" content={pageCanonical} />
+    <meta property="og:image" content={siteConfig.ogImage} />
+    <meta property="og:image:secure_url" content={siteConfig.ogImage} />
+    <meta property="og:image:type" content={siteConfig.ogImageType} />
+    <meta property="og:image:alt" content={siteConfig.ogImageAlt} />
+    <meta property="og:locale" content={pageLocale} />
+    {alternateOgLocales.map((entry: string) => <meta property="og:locale:alternate" content={entry} />)}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content={siteConfig.twitterSite} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={pageDescription} />
+    <meta name="twitter:image" content={siteConfig.ogImage} />
+    <meta name="twitter:image:alt" content={siteConfig.ogImageAlt} />
+    <meta name="twitter:creator" content={siteConfig.twitterCreator} />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&family=Roboto+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+    <link rel="preload" href="/images/logo.webp" as="image" type="image/webp" />
+  </head>
+  <body>
+    <div class="noise-pattern" aria-hidden="true"></div>
+    <Header locale={locale} />
+    <main>
+      <slot />
+    </main>
+    <Footer locale={locale} />
+  </body>
+</html>
