@@ -197,7 +197,6 @@ body {
 .showcase-card {
   appearance: none;
   width: 100%;
-  aspect-ratio: 4 / 3;
   min-height: 100%;
   display: flex;
   flex-direction: column;
@@ -428,6 +427,7 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
   width: 2rem;
   height: 2rem;
   border: 1px solid hsl(var(--border));
@@ -1131,7 +1131,7 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
 
 .footer-socials {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 0.45rem;
   justify-content: center;
 }
@@ -1178,6 +1178,11 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
   .footer-inner {
     grid-template-columns: minmax(280px, 1.2fr) auto minmax(220px, 1fr);
     gap: 1.1rem;
+  }
+
+  .footer-socials {
+    display: grid;
+    grid-template-columns: repeat(3, 2.2rem);
   }
 
   .footer-column-rights .footer-copy {
@@ -1272,14 +1277,17 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
 
 .contact-intent-switch {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 0.65rem;
   margin-bottom: 0.9rem;
   justify-content: center;
 }
 
 .contact-intent-btn {
-  width: 50%;
+  flex: 1 1 calc(50% - 0.35rem);
+  min-width: 120px;
+  white-space: normal;
+  text-align: center;
   min-height: 3rem;
   display: inline-flex;
   align-items: center;
@@ -1290,7 +1298,7 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
   color: color-mix(in oklab, hsl(var(--foreground)) 70%, hsl(var(--muted-foreground)));
   font-family: var(--font-code);
   font-size: var(--fs-xs);
-  padding: 0.75rem 0.9rem;
+  padding: 0.75rem 0.5rem;
   cursor: pointer;
   transition:
     border-color 0.2s ease,
@@ -1374,6 +1382,11 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
 
 .contact-captcha {
   margin-top: 0.15rem;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .contact-submit-btn {
@@ -1436,6 +1449,19 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
   }
 }
 
+@media (max-width: 350px) {
+  .contact-card {
+    padding: 0.75rem;
+  }
+
+  .contact-captcha {
+    transform: scale(0.85);
+    transform-origin: center center;
+    height: auto;
+    margin-block: 0.25rem;
+  }
+}
+
 @media (min-width: 768px) {
   .services-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1463,6 +1489,7 @@ body.mobile-menu-modal.is-closing-mobile-menu::before {
 
   .showcase-card {
     padding: 1.15rem;
+    aspect-ratio: 4 / 3;
   }
 
   .project-dialog-panel {
