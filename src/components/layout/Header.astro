@@ -10,7 +10,6 @@ interface Props {
 }
 
 const { locale } = Astro.props;
-
 ---
 
 <header class="site-header">
@@ -28,44 +27,18 @@ const { locale } = Astro.props;
       <ThemeDropdown locale={locale} />
     </div>
 
-    <details class="mobile-menu">
-      <summary aria-label="Open Menu">
-        <span class="mobile-toggle-icon" aria-hidden="true">
-          <svg viewBox="0 0 24 24" fill="none" class="mobile-menu-icon mobile-menu-icon-open">
-            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-          </svg>
-          <svg viewBox="0 0 24 24" fill="none" class="mobile-menu-icon mobile-menu-icon-close">
-            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
-          </svg>
-        </span>
-      </summary>
-      <div class="mobile-panel card">
-        <div class="mobile-panel-head">
-          <a href={`/${locale}`} class="brand-link" aria-label={t(locale, 'appName')}>
-            <img src="/images/logo.webp" alt="Clancig FullstackDev" width="132" height="40" class="brand-logo mobile-panel-logo" />
-          </a>
-        </div>
-
-        <div class="mobile-separator" aria-hidden="true"></div>
-
-        <nav class="mobile-nav" aria-label="Mobile Navigation">
-          {navItems.map((item) => <a href={item.href} class="mobile-link">{t(locale, item.labelKey)}</a>)}
-        </nav>
-
-        <div class="mobile-separator" aria-hidden="true"></div>
-
-        <div class="mobile-tools">
-          <LocaleDropdown locale={locale} variantClass="mobile-locales" />
-          <ThemeDropdown locale={locale} />
-        </div>
-      </div>
-    </details>
+    <button id="mobile-menu-trigger" type="button" class="mobile-menu-button" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobile-drawer-modal">
+      <span class="mobile-toggle-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" class="mobile-menu-icon">
+          <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" />
+        </svg>
+      </span>
+    </button>
   </div>
 </header>
 
 <script is:inline>
   const THEME_STORAGE_KEY = 'theme-preference';
-  const MOBILE_DRAWER_CLOSE_MS = 420;
 
   const isTheme = (value) => value === 'light' || value === 'dark' || value === 'system';
 
@@ -136,99 +109,9 @@ const { locale } = Astro.props;
     return { closeManagedDropdowns };
   };
 
-  const createMobileMenuController = (mobileMenu, body) => {
-    let mobileClosingTimeout = null;
-    let previousBodyPaddingRight = '';
-
-    const lockPageScroll = () => {
-      if (body.classList.contains('mobile-menu-modal')) return;
-      const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-      previousBodyPaddingRight = body.style.paddingRight;
-      body.classList.add('mobile-menu-modal');
-      body.style.paddingRight = `${Math.max(0, scrollbarWidth)}px`;
-      document.documentElement.style.setProperty('--mobile-scrollbar-comp', `${Math.max(0, scrollbarWidth)}px`);
-    };
-
-    const unlockPageScroll = () => {
-      if (!body.classList.contains('mobile-menu-modal')) return;
-      body.classList.remove('mobile-menu-modal', 'is-closing-mobile-menu');
-      body.style.paddingRight = previousBodyPaddingRight;
-      document.documentElement.style.removeProperty('--mobile-scrollbar-comp');
-    };
-
-    const finishMobileClose = () => {
-      if (!(mobileMenu instanceof HTMLDetailsElement)) return;
-      mobileMenu.classList.remove('is-closing');
-      mobileMenu.removeAttribute('open');
-      unlockPageScroll();
-      if (mobileClosingTimeout !== null) {
-        window.clearTimeout(mobileClosingTimeout);
-        mobileClosingTimeout = null;
-      }
-    };
-
-    const closeMobileMenu = ({ animate = true } = {}) => {
-      if (!(mobileMenu instanceof HTMLDetailsElement) || !mobileMenu.open) return;
-
-      if (!animate) {
-        body.classList.remove('is-closing-mobile-menu');
-        finishMobileClose();
-        return;
-      }
-
-      if (mobileMenu.classList.contains('is-closing')) return;
-      mobileMenu.classList.add('is-closing');
-      body.classList.add('is-closing-mobile-menu');
-      mobileClosingTimeout = window.setTimeout(() => {
-        finishMobileClose();
-      }, MOBILE_DRAWER_CLOSE_MS);
-    };
-
-    const bindMobileMenuLifecycle = () => {
-      if (!(mobileMenu instanceof HTMLDetailsElement)) return;
-      const mobileSummary = mobileMenu.querySelector('summary');
-
-      if (mobileSummary instanceof HTMLElement) {
-        mobileSummary.addEventListener('click', (event) => {
-          if (!mobileMenu.open) return;
-          event.preventDefault();
-          closeMobileMenu();
-        });
-      }
-
-      mobileMenu.addEventListener('toggle', () => {
-        if (mobileMenu.open) {
-          lockPageScroll();
-          body.classList.remove('is-closing-mobile-menu');
-          return;
-        }
-
-        mobileMenu.classList.remove('is-closing');
-        unlockPageScroll();
-      });
-
-      mobileMenu.querySelectorAll('.mobile-link, .mobile-panel-head .brand-link').forEach((element) => {
-        element.addEventListener('click', () => {
-          closeMobileMenu();
-        });
-      });
-
-      window.addEventListener('resize', () => {
-        if (window.matchMedia('(min-width: 900px)').matches) {
-          closeMobileMenu({ animate: false });
-        }
-      });
-    };
-
-    return { closeMobileMenu, bindMobileMenuLifecycle };
-  };
-
   const setupHeaderInteractions = () => {
     const managedDropdowns = Array.from(document.querySelectorAll('details.locale-dropdown, details.theme-dropdown'));
-    const mobileMenu = document.querySelector('details.mobile-menu');
-    const body = document.body;
     const { closeManagedDropdowns } = setupManagedDropdowns(managedDropdowns);
-    const { closeMobileMenu, bindMobileMenuLifecycle } = createMobileMenuController(mobileMenu, body);
 
     document.addEventListener('click', (event) => {
       if (
@@ -249,11 +132,14 @@ const { locale } = Astro.props;
           const hasTarget = getTargetFromHash(hash);
           if (hasTarget) {
             event.preventDefault();
-            const shouldDelayScroll = mobileMenu instanceof HTMLDetailsElement && mobileMenu.open;
-            if (shouldDelayScroll) {
-              closeMobileMenu();
+            const drawerModal = document.getElementById('mobile-drawer-modal');
+            const isDrawerOpen = drawerModal && drawerModal.classList.contains('is-open');
+            if (isDrawerOpen) {
+              drawerModal.classList.remove('is-open');
+              drawerModal.setAttribute('aria-hidden', 'true');
+              document.getElementById('mobile-menu-trigger')?.setAttribute('aria-expanded', 'false');
             }
-            scrollToHashTarget(hash, shouldDelayScroll ? MOBILE_DRAWER_CLOSE_MS : 0);
+            scrollToHashTarget(hash, isDrawerOpen ? 320 : 0);
             return;
           }
         }
@@ -264,23 +150,13 @@ const { locale } = Astro.props;
       if (!clickedInsideDropdown) {
         closeManagedDropdowns();
       }
-
-      if (mobileMenu instanceof HTMLDetailsElement && mobileMenu.open) {
-        const clickedInsideMobile = mobileMenu.contains(event.target);
-        if (!clickedInsideMobile) {
-          closeMobileMenu();
-        }
-      }
     });
 
     document.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') {
         closeManagedDropdowns();
-        closeMobileMenu();
       }
     });
-
-    bindMobileMenuLifecycle();
   };
 
   const setupThemeSwitcher = () => {

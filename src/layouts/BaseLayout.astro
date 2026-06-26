@@ -4,6 +4,7 @@ import { locales, siteConfig, type Locale } from '@/config/site';
 import { buildDescription } from '@/lib/metadata';
 import Header from '@/components/layout/Header.astro';
 import Footer from '@/components/layout/Footer.astro';
+import MobileDrawer from '@/components/layout/MobileDrawer.astro';
 
 interface Props {
   locale: Locale;
@@ -79,5 +80,6 @@ const alternateOgLocales = locales
       <slot />
     </main>
     <Footer locale={locale} />
+    <MobileDrawer locale={locale} />
   </body>
 </html>

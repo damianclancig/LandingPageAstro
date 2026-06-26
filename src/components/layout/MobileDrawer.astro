@@ -1,0 +1,101 @@
+---
+import type { Locale } from '@/config/site';
+import { navItems } from '@/data/nav-items';
+import { t } from '@/i18n';
+import LocaleDropdown from './header/LocaleDropdown.astro';
+import ThemeDropdown from './header/ThemeDropdown.astro';
+
+interface Props {
+  locale: Locale;
+}
+
+const { locale } = Astro.props;
+---
+
+<div id="mobile-drawer-modal" class="mobile-drawer-modal" aria-hidden="true" role="dialog" aria-modal="true" aria-label="Menú de navegación móvil">
+  <div id="mobile-drawer-backdrop" class="mobile-drawer-backdrop" aria-hidden="true"></div>
+
+  <aside id="mobile-drawer-panel" class="mobile-drawer-panel card">
+    <div class="mobile-panel-head">
+      <a href={`/${locale}`} class="brand-link" aria-label={t(locale, 'appName')}>
+        <img src="/images/logo.webp" alt="Clancig FullstackDev" width="132" height="40" class="brand-logo mobile-panel-logo" />
+      </a>
+      <button id="mobile-drawer-close-btn" type="button" class="mobile-drawer-close-btn" aria-label="Cerrar menú">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="mobile-drawer-close-icon">
+          <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="mobile-separator" aria-hidden="true"></div>
+
+    <nav class="mobile-nav" aria-label="Mobile Navigation">
+      {navItems.map((item) => <a href={item.href} class="mobile-link drawer-nav-link">{t(locale, item.labelKey)}</a>)}
+    </nav>
+
+    <div class="mobile-separator" aria-hidden="true"></div>
+
+    <div class="mobile-tools">
+      <LocaleDropdown locale={locale} variantClass="mobile-locales" />
+      <ThemeDropdown locale={locale} />
+    </div>
+  </aside>
+</div>
+
+<script is:inline>
+  (() => {
+    const modal = document.getElementById('mobile-drawer-modal');
+    const backdrop = document.getElementById('mobile-drawer-backdrop');
+    const trigger = document.getElementById('mobile-menu-trigger');
+    const closeBtn = document.getElementById('mobile-drawer-close-btn');
+
+    if (!modal || !trigger || !closeBtn) return;
+
+    let isOpen = false;
+
+    const openDrawer = () => {
+      if (isOpen) return;
+      isOpen = true;
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      trigger.setAttribute('aria-expanded', 'true');
+    };
+
+    const closeDrawer = () => {
+      if (!isOpen) return;
+      isOpen = false;
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      trigger.setAttribute('aria-expanded', 'false');
+    };
+
+    trigger.addEventListener('click', (e) => {
+      e.preventDefault();
+      openDrawer();
+    });
+
+    closeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      closeDrawer();
+    });
+
+    if (backdrop) {
+      backdrop.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeDrawer();
+      });
+    }
+
+    modal.querySelectorAll('.drawer-nav-link, .brand-link').forEach((link) => {
+      link.addEventListener('click', () => {
+        closeDrawer();
+      });
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        closeDrawer();
+      }
+    });
+  })();
+</script>
