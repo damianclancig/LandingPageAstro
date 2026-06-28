@@ -86,7 +86,8 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
     }
 
     if (!import.meta.env.DEV && showCaptcha && (turnstileSiteKey || recaptchaSiteKey)) {
-      const turnstileToken = window.turnstile?.getResponse?.() || (form.get('cf-turnstile-response') as string | null);
+      const turnstileToken =
+        window.turnstile?.getResponse?.() || (form.get('cf-turnstile-response') as string | null);
       const recaptchaToken =
         window.grecaptcha?.getResponse?.() ||
         (form.get('g-recaptcha-response') as string | null) ||

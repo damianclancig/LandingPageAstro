@@ -109,11 +109,15 @@ export const POST: APIRoute = async ({ request }) => {
         ? data.message
         : `Tipo de Proyecto: ${data.projectType ?? 'N/A'}\n\nDesafío:\n${data.message}`;
 
+    const entityName =
+      data.intent === 'recruiter' ? data.company || 'Reclutador' : data.clientName || 'Cliente';
+
     await sendContactEmail({
-      subject: `Nuevo Mensaje desde Clancig Landing: ${senderName}`,
+      subject: `Clancig FullstackDev - Consulta de ${entityName}`,
       fromName: senderName,
       fromEmail: data.email,
       message: formattedMessage,
+      formData: data,
     });
 
     return new Response(JSON.stringify({ success: true, message: 'contact-form-success' }), {
