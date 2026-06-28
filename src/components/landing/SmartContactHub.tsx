@@ -25,6 +25,10 @@ declare global {
       getResponse: () => string;
       reset: () => void;
     };
+    turnstile?: {
+      getResponse: () => string;
+      reset: () => void;
+    };
   }
 }
 
@@ -73,10 +77,6 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
       return;
     }
 
-    setStatus('sending');
-    setMessage('');
-    setFieldErrors({});
-
     const form = new FormData(event.currentTarget);
     form.set('intent', intent);
 
@@ -84,6 +84,31 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
       const recaptchaToken = window.grecaptcha?.getResponse?.() ?? '';
       form.set('recaptcha-token', recaptchaToken);
     }
+
+    if (!import.meta.env.DEV && showCaptcha && (turnstileSiteKey || recaptchaSiteKey)) {
+      const turnstileToken = window.turnstile?.getResponse?.() || (form.get('cf-turnstile-response') as string | null);
+      const recaptchaToken =
+        window.grecaptcha?.getResponse?.() ||
+        (form.get('g-recaptcha-response') as string | null) ||
+        (form.get('recaptcha-token') as string | null);
+      const token = [turnstileToken, recaptchaToken]
+        .map((t) => (typeof t === 'string' ? t.trim() : ''))
+        .find((t) => t !== '');
+
+      if (!token) {
+        setStatus('error');
+        setMessage(
+          labels['landing-contact-recaptcha-verify'] ??
+            labels['recaptcha-verification-failed'] ??
+            'Por favor, verifica que no eres un robot.',
+        );
+        return;
+      }
+    }
+
+    setStatus('sending');
+    setMessage('');
+    setFieldErrors({});
 
     const res = await fetch('/api/contact', {
       method: 'POST',
@@ -96,6 +121,7 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
       setMessage(labels['landing-contact-form-success-message']);
       event.currentTarget.reset();
       window.grecaptcha?.reset?.();
+      window.turnstile?.reset?.();
       return;
     }
 
@@ -103,6 +129,7 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
     setFieldErrors(json.errors ?? {});
     setMessage(labels[json.message ?? ''] ?? labels['contact-form-error-user-friendly']);
     window.grecaptcha?.reset?.();
+    window.turnstile?.reset?.();
   }
 
   return (

@@ -26,7 +26,7 @@ async function verifyCaptcha(token: string | null): Promise<{
   message?: 'recaptcha-verification-failed' | 'recaptcha-service-unavailable';
 }> {
   if (import.meta.env.DEV) return { ok: true };
-  if (!token) return { ok: false, message: 'recaptcha-verification-failed' };
+  if (!token || token.trim() === '') return { ok: false, message: 'recaptcha-verification-failed' };
 
   const turnstileSecret = import.meta.env.TURNSTILE_SECRET_KEY;
   if (turnstileSecret) {
@@ -45,7 +45,7 @@ async function verifyCaptcha(token: string | null): Promise<{
   }
 
   const recaptchaSecret = import.meta.env.RECAPTCHA_SECRET_KEY;
-  if (!recaptchaSecret) return { ok: true };
+  if (!recaptchaSecret) return { ok: false, message: 'recaptcha-verification-failed' };
 
   try {
     const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
@@ -64,10 +64,14 @@ export const POST: APIRoute = async ({ request }) => {
   try {
     const formData = await request.formData();
 
+    const rawTurnstile = formData.get('cf-turnstile-response');
+    const rawRecaptchaToken = formData.get('recaptcha-token');
+    const rawGRecaptcha = formData.get('g-recaptcha-response');
+
     const token =
-      (formData.get('cf-turnstile-response') as string | null) ??
-      (formData.get('recaptcha-token') as string | null) ??
-      null;
+      [rawTurnstile, rawRecaptchaToken, rawGRecaptcha]
+        .map((t) => (typeof t === 'string' ? t.trim() : ''))
+        .find((t) => t !== '') ?? null;
 
     const captchaResult = await verifyCaptcha(token);
     if (!captchaResult.ok) {

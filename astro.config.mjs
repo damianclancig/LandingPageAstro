@@ -7,6 +7,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://www.clancig.com.ar',
   output: 'server',
+  security: {
+    checkOrigin: false,
+  },
   adapter: vercel(),
   integrations: [react(), sitemap()],
   i18n: {

@@ -29,5 +29,5 @@ const labels = dictionaries[locale];
   client:load
   labels={labels}
   turnstileSiteKey={import.meta.env.PUBLIC_TURNSTILE_SITE_KEY}
-  recaptchaSiteKey={import.meta.env.NEXT_PUBLIC_RECAPTCHA_PUBLIC_KEY}
+  recaptchaSiteKey={import.meta.env.PUBLIC_RECAPTCHA_SITE_KEY ?? import.meta.env.NEXT_PUBLIC_RECAPTCHA_PUBLIC_KEY}
 />
