@@ -1,6 +1,8 @@
 import type { APIRoute } from 'astro';
 import { z } from 'zod';
 import { ContactEmailError, sendContactEmail } from '@/lib/email';
+import { logger } from '@/utils/server-logger';
+import { AppError } from '@/errors/app-error';
 
 export const prerender = false;
 
@@ -75,6 +77,7 @@ export const POST: APIRoute = async ({ request }) => {
 
     const captchaResult = await verifyCaptcha(token);
     if (!captchaResult.ok) {
+      logger.warn({ message: captchaResult.message }, 'Captcha verification failed on contact form');
       return new Response(
         JSON.stringify({
           success: false,
@@ -87,6 +90,7 @@ export const POST: APIRoute = async ({ request }) => {
     const parsed = schema.safeParse(Object.fromEntries(formData.entries()));
     if (!parsed.success) {
       const { fieldErrors } = z.flattenError(parsed.error);
+      logger.warn({ fieldErrors }, 'Form schema validation failed');
       return new Response(
         JSON.stringify({
           success: false,
@@ -120,23 +124,29 @@ export const POST: APIRoute = async ({ request }) => {
       formData: data,
     });
 
+    logger.info({ intent: data.intent, entityName }, 'Contact form processed and email sent successfully');
+
     return new Response(JSON.stringify({ success: true, message: 'contact-form-success' }), {
       status: 200,
     });
   } catch (error) {
-    if (error instanceof ContactEmailError) {
-      console.error('ContactEmailError:', error.code, error.technicalMessage);
+    if (error instanceof AppError || error instanceof ContactEmailError) {
+      logger.error(
+        { err: error, code: error.code, metadata: error.metadata },
+        'Operational error during contact email submission',
+      );
+      const statusCode = error.code === 'contact-form-error-server-config' ? 500 : 502;
       return new Response(
         JSON.stringify({
           success: false,
           message: error.code,
-          technicalError: error.technicalMessage,
+          technicalError: error instanceof ContactEmailError ? error.technicalMessage : error.message,
         }),
-        { status: error.code === 'contact-form-error-server-config' ? 500 : 502 },
+        { status: statusCode },
       );
     }
 
-    console.error('Unexpected contact error:', error);
+    logger.error({ err: error }, 'Unexpected critical exception processing contact form');
     return new Response(
       JSON.stringify({ success: false, message: 'contact-form-error-unexpected' }),
       { status: 500 },

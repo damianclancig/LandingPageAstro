@@ -70,6 +70,7 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
 
   async function handleSubmit(event: SubmitEventLike) {
     event.preventDefault();
+    const formElement = event.currentTarget;
 
     if (!intent) {
       setStatus('error');
@@ -77,7 +78,7 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
       return;
     }
 
-    const form = new FormData(event.currentTarget);
+    const form = new FormData(formElement);
     form.set('intent', intent);
 
     if (!turnstileSiteKey && recaptchaSiteKey) {
@@ -120,7 +121,7 @@ export default function SmartContactHub({ labels, turnstileSiteKey, recaptchaSit
     if (res.ok && json.success) {
       setStatus('success');
       setMessage(labels['landing-contact-form-success-message']);
-      event.currentTarget.reset();
+      formElement?.reset();
       window.grecaptcha?.reset?.();
       window.turnstile?.reset?.();
       return;

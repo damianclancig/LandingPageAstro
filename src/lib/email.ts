@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { AppError } from '@/errors/app-error';
 
 export type ContactFormData = {
   email: string;
@@ -23,13 +24,12 @@ export type ContactEmailErrorCode =
   | 'contact-form-error-api'
   | 'contact-form-error-unexpected';
 
-export class ContactEmailError extends Error {
-  code: ContactEmailErrorCode;
+export class ContactEmailError extends AppError {
+  declare code: ContactEmailErrorCode;
   technicalMessage?: string;
 
   constructor(code: ContactEmailErrorCode, technicalMessage?: string) {
-    super(code);
-    this.code = code;
+    super(technicalMessage || code, code, true, { technicalMessage });
     this.technicalMessage = technicalMessage;
   }
 }
