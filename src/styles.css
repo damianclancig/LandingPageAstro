@@ -123,6 +123,7 @@ body {
   font-size: clamp(1.95rem, 1.25rem + 3.2vw, 3.2rem);
   font-weight: 800;
   letter-spacing: -0.02em;
+  padding-bottom: 1rem;
 }
 
 .hero-heading-secondary {
@@ -131,11 +132,12 @@ body {
   font-size: var(--fs-2xl);
   font-weight: 500;
   opacity: 0.95;
+  padding-bottom: 1rem;
 }
 
 .hero-sub {
   max-width: 760px;
-  padding-bottom: 0;
+  padding-bottom: 1rem;
   font-size: var(--fs-lg);
 }
 
