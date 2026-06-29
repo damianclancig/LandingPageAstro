@@ -1,9 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import type { Locale } from '@/config/site';
 import { navItems } from '@/data/nav-items';
 import { t } from '@/i18n';
 import LocaleDropdown from './header/LocaleDropdown.astro';
 import ThemeDropdown from './header/ThemeDropdown.astro';
+import logoImage from '@/assets/images/logo.webp';
 
 interface Props {
   locale: Locale;
@@ -15,7 +17,7 @@ const { locale } = Astro.props;
 <header class="site-header">
   <div class="container header-inner">
     <a href={`/${locale}`} class="brand-link" aria-label={t(locale, 'appName')}>
-      <img src="/images/logo.webp" alt="Clancig FullstackDev" width="150" height="46" class="brand-logo" />
+      <Image src={logoImage} alt="Clancig FullstackDev" width={150} height={46} class="brand-logo" loading="eager" />
     </a>
 
     <nav class="desktop-nav" aria-label="Primary Navigation">

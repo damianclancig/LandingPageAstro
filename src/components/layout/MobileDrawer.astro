@@ -1,9 +1,11 @@
 ---
+import { Image } from 'astro:assets';
 import type { Locale } from '@/config/site';
 import { navItems } from '@/data/nav-items';
 import { t } from '@/i18n';
 import LocaleDropdown from './header/LocaleDropdown.astro';
 import ThemeDropdown from './header/ThemeDropdown.astro';
+import logoImage from '@/assets/images/logo.webp';
 
 interface Props {
   locale: Locale;
@@ -18,7 +20,7 @@ const { locale } = Astro.props;
   <aside id="mobile-drawer-panel" class="mobile-drawer-panel card">
     <div class="mobile-panel-head">
       <a href={`/${locale}`} class="brand-link" aria-label={t(locale, 'appName')}>
-        <img src="/images/logo.webp" alt="Clancig FullstackDev" width="132" height="40" class="brand-logo mobile-panel-logo" />
+        <Image src={logoImage} alt="Clancig FullstackDev" width={132} height={40} class="brand-logo mobile-panel-logo" />
       </a>
       <button id="mobile-drawer-close-btn" type="button" class="mobile-drawer-close-btn" aria-label="Cerrar menú">
         <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" class="mobile-drawer-close-icon">
