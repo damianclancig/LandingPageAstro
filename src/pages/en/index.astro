@@ -4,6 +4,7 @@ import LandingPage from '@/components/landing/LandingPage.astro';
 import { buildCanonical, buildTitle } from '@/lib/metadata';
 ---
 
-<BaseLayout locale="en" title={buildTitle()} canonical={buildCanonical('en')}>
+<BaseLayout locale="en" title={buildTitle('en')} canonical={buildCanonical('en')}>
   <LandingPage locale="en" />
 </BaseLayout>
+
