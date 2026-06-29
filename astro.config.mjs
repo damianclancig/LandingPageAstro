@@ -10,7 +10,9 @@ export default defineConfig({
   security: {
     checkOrigin: false,
   },
-  adapter: vercel(),
+  adapter: vercel({
+    imageService: true,
+  }),
   integrations: [react(), sitemap()],
   i18n: {
     defaultLocale: 'es',
