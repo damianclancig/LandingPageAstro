@@ -30,9 +30,9 @@ export const siteConfig = {
     pt: 'Damián Clancig, Desenvolvedor Full-Stack, Programador, Astro, React, Node.js, Flutter, TypeScript, Tailwind CSS, Aplicações Web, Aplicativos Móveis, Portfólio Developer, Argentina',
   } as const,
   descriptionMap: {
-    es: 'Portfolio de Damián Clancig, Desarrollador Full-Stack especializado en crear aplicaciones web y móviles modernas con Astro, React, Node.js y Flutter.',
-    en: 'Portfolio of Damián Clancig, a Full-Stack Developer specialized in building modern web and mobile applications with Astro, React, Node.js, and Flutter.',
-    pt: 'Portfólio de Damián Clancig, Desenvolvedor Full-Stack especializado em criar aplicações web e móveis modernas com Astro, React, Node.js e Flutter.',
+    es: 'Portafolio de Damián Clancig: Casos de estudio y plataformas desarrolladas. Especializado en desarrollo Full-Stack y Mobile (Astro, React, Node.js, Flutter).',
+    en: 'Portfolio of Damián Clancig: Case studies and platforms developed. Specialized in Full-Stack and Mobile development (Astro, React, Node.js, Flutter).',
+    pt: 'Portfólio de Damián Clancig: Casos de estudo e plataformas desenvolvidas. Especializado em desenvolvimento Full-Stack e Mobile (Astro, React, Node.js, Flutter).',
   } as const,
 };
 
