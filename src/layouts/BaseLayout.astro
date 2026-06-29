@@ -116,7 +116,7 @@ const schemaData = JSON.stringify({
     <meta name="twitter:image" content={siteConfig.ogImage} />
     <meta name="twitter:image:alt" content={siteConfig.ogImageAlt} />
     <meta name="twitter:creator" content={siteConfig.twitterCreator} />
-    <script type="application/ld+json" set:html={schemaData} />
+    <script is:inline type="application/ld+json" set:html={schemaData} />
   </head>
   <body>
     <div class="noise-pattern" aria-hidden="true"></div>

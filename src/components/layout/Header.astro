@@ -39,17 +39,19 @@ const { locale } = Astro.props;
   </div>
 </header>
 
-<script is:inline>
+<script>
   const THEME_STORAGE_KEY = 'theme-preference';
 
-  const isTheme = (value) => value === 'light' || value === 'dark' || value === 'system';
+  type Theme = 'light' | 'dark' | 'system';
 
-  const getStoredTheme = () => {
+  const isTheme = (value: unknown): value is Theme => value === 'light' || value === 'dark' || value === 'system';
+
+  const getStoredTheme = (): Theme => {
     const saved = window.localStorage.getItem(THEME_STORAGE_KEY);
     return isTheme(saved) ? saved : 'system';
   };
 
-  const applyTheme = (theme) => {
+  const applyTheme = (theme: Theme) => {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const resolvedTheme = theme === 'system' ? (prefersDark ? 'dark' : 'light') : theme;
     document.documentElement.classList.toggle('dark', resolvedTheme === 'dark');
@@ -66,19 +68,19 @@ const { locale } = Astro.props;
     });
   };
 
-  const setTheme = (theme) => {
+  const setTheme = (theme: Theme) => {
     window.localStorage.setItem(THEME_STORAGE_KEY, theme);
     applyTheme(theme);
     updateThemeOptionsUI();
   };
 
-  const getTargetFromHash = (hash) => {
+  const getTargetFromHash = (hash: string | null) => {
     if (!hash || !hash.startsWith('#') || hash.length < 2) return null;
     const targetId = decodeURIComponent(hash.slice(1));
     return document.getElementById(targetId);
   };
 
-  const scrollToHashTarget = (hash, delayMs = 0) => {
+  const scrollToHashTarget = (hash: string, delayMs = 0) => {
     const target = getTargetFromHash(hash);
     if (!(target instanceof HTMLElement)) return;
     const run = () => {
@@ -92,8 +94,8 @@ const { locale } = Astro.props;
     run();
   };
 
-  const setupManagedDropdowns = (managedDropdowns) => {
-    const closeManagedDropdowns = (except) => {
+  const setupManagedDropdowns = (managedDropdowns: HTMLDetailsElement[]) => {
+    const closeManagedDropdowns = (except?: HTMLDetailsElement) => {
       managedDropdowns.forEach((dropdown) => {
         if (dropdown === except) return;
         dropdown.removeAttribute('open');
@@ -112,7 +114,7 @@ const { locale } = Astro.props;
   };
 
   const setupHeaderInteractions = () => {
-    const managedDropdowns = Array.from(document.querySelectorAll('details.locale-dropdown, details.theme-dropdown'));
+    const managedDropdowns = Array.from(document.querySelectorAll<HTMLDetailsElement>('details.locale-dropdown, details.theme-dropdown'));
     const { closeManagedDropdowns } = setupManagedDropdowns(managedDropdowns);
 
     document.addEventListener('click', (event) => {
@@ -148,7 +150,7 @@ const { locale } = Astro.props;
       }
 
       if (!(event.target instanceof Node)) return;
-      const clickedInsideDropdown = managedDropdowns.some((dropdown) => dropdown.contains(event.target));
+      const clickedInsideDropdown = managedDropdowns.some((dropdown) => dropdown.contains(event.target as Node));
       if (!clickedInsideDropdown) {
         closeManagedDropdowns();
       }

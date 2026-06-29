@@ -11,7 +11,7 @@
     "test": "playwright test",
     "dev": "astro dev",
     "start": "astro dev",
-    "build": "astro build",
+    "build": "pnpm typecheck && pnpm lint && astro build",
     "preview": "astro preview",
     "typecheck": "astro check",
     "lint": "eslint .",

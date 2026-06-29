@@ -13,7 +13,7 @@ const { locale } = Astro.props;
 ---
 
 <section style="position:relative;min-height:88vh;display:grid;place-items:center;overflow:hidden;background:hsl(var(--background));padding-top:clamp(4rem,9vw,5.75rem);">
-  <Image src={backgroundImage} alt={t(locale, 'hero-codeBackgroundAlt')} width={1600} loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(7px);transform:scale(1.03);" />
+  <Image src={backgroundImage} alt={t(locale, 'hero-codeBackgroundAlt')} width={600} loading="eager" fetchpriority="high" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(7px);transform:scale(1.03);" />
   <div style="position:absolute;inset:0;background:linear-gradient(180deg, hsl(var(--background) / 0.76) 0%, hsl(var(--background) / 0.84) 100%);"></div>
   <div class="container" style="position:relative;z-index:2;text-align:center;transform:translateY(-48px);">
     <Image src={profileImage} alt="Damián Clancig" width={187} height={187} loading="eager" fetchpriority="high" style="display:block;margin-inline:auto;width:187px;height:187px;border-radius:999px;border:4px solid rgba(8,8,8,.95);object-fit:cover;box-shadow:0 0 36px rgba(45,212,191,.62),0 0 86px rgba(45,212,191,.38);" />

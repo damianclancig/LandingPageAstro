@@ -14,7 +14,7 @@ const labels = dictionaries[locale];
     <h2 class="section-title">{t(locale, 'landing-portfolio-title')}</h2>
     <p class="section-sub">{t(locale, 'landing-portfolio-subtitle')}</p>
     <div class="showcase-grid">
-      {projects.map((project) => <ProjectDialog client:load project={project} labels={labels} />)}
+      {projects.map((project) => <ProjectDialog client:visible project={project} labels={labels} />)}
     </div>
   </div>
 </section>
